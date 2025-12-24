@@ -10,17 +10,14 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/node": "^9.5.1",
     "@astrojs/tailwind": "^5.0.0",
     "astro": "^5.16.6",
     "html2canvas": "^1.4.1",
     "jspdf": "^3.0.4",
-    "nodemailer": "^7.0.12",
     "tailwindcss": "^3.4.0"
   },
   "devDependencies": {
     "@astrojs/check": "^0.3.0",
-    "@types/nodemailer": "^7.0.4",
     "typescript": "^5.3.0"
   }
 }
