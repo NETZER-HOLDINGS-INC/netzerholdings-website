@@ -6,13 +6,22 @@ export const prerender = false;
 export const POST: APIRoute = async ({ request }) => {
   try {
     const data = await request.json();
-    
+
     // Get email configuration from environment variables
-    const INVOICE_EMAIL = import.meta.env.INVOICE_EMAIL || 'general@netzerholdings.com';
-    const SMTP_HOST = import.meta.env.SMTP_HOST;
-    const SMTP_PORT = import.meta.env.SMTP_PORT || '587';
-    const SMTP_USER = import.meta.env.SMTP_USER;
-    const SMTP_PASS = import.meta.env.SMTP_PASS;
+    // Use process.env for runtime variables in server-side code
+    const INVOICE_EMAIL = process.env.INVOICE_EMAIL || 'general@netzerholdings.com';
+    const SMTP_HOST = process.env.SMTP_HOST;
+    const SMTP_PORT = process.env.SMTP_PORT || '587';
+    const SMTP_USER = process.env.SMTP_USER;
+    const SMTP_PASS = process.env.SMTP_PASS;
+
+    // Debug logging (remove in production if needed)
+    console.log('Environment check:', {
+      hasHost: !!SMTP_HOST,
+      hasUser: !!SMTP_USER,
+      hasPass: !!SMTP_PASS,
+      invoiceEmail: INVOICE_EMAIL
+    });
 
     // Validate required data
     if (!data.billTo || !data.from || !data.invoice || !data.lineItems) {

@@ -26,9 +26,9 @@ COPY --from=builder /app/package.json ./
 
 # Set environment variables
 ENV HOST=0.0.0.0
-ENV PORT=4321
+ENV PORT=80
 
-EXPOSE 4321
+EXPOSE 80
 
 # Start the Node.js server
 CMD ["node", "./dist/server/entry.mjs"]
