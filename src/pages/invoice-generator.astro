@@ -25,11 +25,8 @@ import Footer from '../components/Footer.astro';
                 <label class="block text-sm font-medium text-gray-700 mb-2">Company *</label>
                 <select id="bill-to-company" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent">
                   <option value="">Select Company...</option>
-                  <option value="ahsn">American Home Services Network LLC</option>
-                  <option value="chimney">Chimney Services Division</option>
-                  <option value="airduct">Air Duct Services Division</option>
-                  <option value="dryervent">Dryer Vent Services Division</option>
-                  <option value="garagedoor">Garage Door Services Division</option>
+                  <option value="netzer">Netzer Holdings Inc</option>
+                  <option value="airchimney">Air and Chimney Services</option>
                   <option value="custom">Custom (Edit Below)</option>
                 </select>
               </div>
@@ -222,30 +219,15 @@ import Footer from '../components/Footer.astro';
 
   // Company data
   const companyData = {
-    'ahsn': {
-      name: 'American Home Services Network LLC',
-      address: '123 Business Center Dr, Suite 100',
-      email: 'billing@ahsn.com'
+    'netzer': {
+      name: 'Netzer Holdings Inc',
+      address: '1234 Main Street, Suite 500, New York, NY 10001',
+      email: 'billing@netzerholdings.com'
     },
-    'chimney': {
-      name: 'Chimney Services Division - AHSN',
-      address: '123 Business Center Dr, Suite 100',
-      email: 'chimney-billing@ahsn.com'
-    },
-    'airduct': {
-      name: 'Air Duct Services Division - AHSN',
-      address: '123 Business Center Dr, Suite 100',
-      email: 'airduct-billing@ahsn.com'
-    },
-    'dryervent': {
-      name: 'Dryer Vent Services Division - AHSN',
-      address: '123 Business Center Dr, Suite 100',
-      email: 'dryervent-billing@ahsn.com'
-    },
-    'garagedoor': {
-      name: 'Garage Door Services Division - AHSN',
-      address: '123 Business Center Dr, Suite 100',
-      email: 'garagedoor-billing@ahsn.com'
+    'airchimney': {
+      name: 'Air and Chimney Services',
+      address: '5678 Service Road, Brooklyn, NY 11201',
+      email: 'billing@airandchimneyservices.com'
     }
   };
 
@@ -583,8 +565,12 @@ import Footer from '../components/Footer.astro';
     }
 
     // Collect form data
+    const companySelect = (document.getElementById('bill-to-company') as HTMLSelectElement);
+    const companyKey = companySelect.value !== 'custom' ? companySelect.value : null;
+
     const formData = {
       billTo: {
+        companyKey: companyKey,
         company: (document.getElementById('custom-company-name') as HTMLInputElement).value,
         address: (document.getElementById('company-address') as HTMLInputElement).value,
         email: (document.getElementById('company-email') as HTMLInputElement).value,

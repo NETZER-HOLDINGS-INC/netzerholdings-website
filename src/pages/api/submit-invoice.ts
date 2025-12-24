@@ -43,6 +43,7 @@ export const POST: APIRoute = async ({ request }) => {
       contractor_email: data.from.email,
       contractor_phone: data.from.phone,
       contractor_address: data.from.address,
+      company_key: data.billTo.companyKey,
       company_name: data.billTo.company,
       company_address: data.billTo.address,
       company_email: data.billTo.email,

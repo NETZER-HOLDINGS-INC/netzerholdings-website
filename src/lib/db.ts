@@ -24,6 +24,7 @@ db.exec(`
     contractor_email TEXT NOT NULL,
     contractor_phone TEXT,
     contractor_address TEXT,
+    company_key TEXT,
     company_name TEXT NOT NULL,
     company_address TEXT,
     company_email TEXT,
@@ -39,6 +40,7 @@ db.exec(`
   CREATE INDEX IF NOT EXISTS idx_invoice_number ON invoices(invoice_number);
   CREATE INDEX IF NOT EXISTS idx_created_at ON invoices(created_at);
   CREATE INDEX IF NOT EXISTS idx_contractor_email ON invoices(contractor_email);
+  CREATE INDEX IF NOT EXISTS idx_company_key ON invoices(company_key);
 `);
 
 export interface Invoice {
@@ -48,6 +50,7 @@ export interface Invoice {
   contractor_email: string;
   contractor_phone?: string;
   contractor_address?: string;
+  company_key?: string;
   company_name: string;
   company_address?: string;
   company_email?: string;
@@ -87,9 +90,9 @@ export function saveInvoice(invoice: Invoice): number {
   const stmt = db.prepare(`
     INSERT INTO invoices (
       invoice_number, contractor_name, contractor_email, contractor_phone,
-      contractor_address, company_name, company_address, company_email,
+      contractor_address, company_key, company_name, company_address, company_email,
       invoice_date, due_date, notes, total, line_items, status
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `);
 
   const result = stmt.run(
@@ -98,6 +101,7 @@ export function saveInvoice(invoice: Invoice): number {
     invoice.contractor_email,
     invoice.contractor_phone || null,
     invoice.contractor_address || null,
+    invoice.company_key || null,
     invoice.company_name,
     invoice.company_address || null,
     invoice.company_email || null,
@@ -128,6 +132,12 @@ export function getAllInvoices(limit = 100, offset = 0): Invoice[] {
 export function getInvoicesByContractor(email: string): Invoice[] {
   const stmt = db.prepare('SELECT * FROM invoices WHERE contractor_email = ? ORDER BY created_at DESC');
   return stmt.all(email) as Invoice[];
+}
+
+// Get invoices by company
+export function getInvoicesByCompany(companyKey: string): Invoice[] {
+  const stmt = db.prepare('SELECT * FROM invoices WHERE company_key = ? ORDER BY created_at DESC');
+  return stmt.all(companyKey) as Invoice[];
 }
 
 // Update invoice status
