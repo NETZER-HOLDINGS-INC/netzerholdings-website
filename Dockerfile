@@ -6,32 +6,30 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install dependencies
-RUN npm install
+RUN npm ci --only=production
 
 # Copy source files
 COPY . .
 
-# Build the application (skip type checking for now)
-RUN npm run build -- --no-check
+# Build the application
+RUN npm run build
 
 # Production stage
-FROM nginx:alpine
+FROM node:18-alpine
 
-# Copy built files to nginx
-COPY --from=builder /app/dist /usr/share/nginx/html
+WORKDIR /app
 
-# Create nginx config for SPA routing
-RUN echo 'server { \
-    listen 80; \
-    server_name _; \
-    root /usr/share/nginx/html; \
-    index index.html; \
-    location / { \
-        try_files $uri $uri/ /index.html; \
-    } \
-}' > /etc/nginx/conf.d/default.conf
+# Copy built application
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/package.json ./
 
-EXPOSE 80
+# Set environment variables
+ENV HOST=0.0.0.0
+ENV PORT=4321
 
-CMD ["nginx", "-g", "daemon off;"]
+EXPOSE 4321
+
+# Start the Node.js server
+CMD ["node", "./dist/server/entry.mjs"]
 

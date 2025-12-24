@@ -137,13 +137,16 @@ import Footer from '../components/Footer.astro';
           <!-- Action Buttons -->
           <div class="flex flex-col sm:flex-row gap-4 mt-8">
             <button type="button" id="preview-btn" class="flex-1 px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors font-semibold">
-              Preview Invoice
+              👁️ Preview Invoice
             </button>
             <button type="button" id="download-btn" class="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold">
-              Download PDF
+              📄 Download PDF
+            </button>
+            <button type="button" id="print-btn" class="flex-1 px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-semibold">
+              🖨️ Print/Save PDF
             </button>
             <button type="submit" class="flex-1 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold">
-              📧 Prepare Email & Download
+              📧 Submit Invoice
             </button>
           </div>
         </form>
@@ -482,26 +485,70 @@ import Footer from '../components/Footer.astro';
     if (!element) return;
 
     try {
+      // Show the preview temporarily for rendering
+      const previewDiv = document.getElementById('invoice-preview');
+      const wasHidden = previewDiv?.classList.contains('hidden');
+      previewDiv?.classList.remove('hidden');
+
+      // Wait for rendering
+      await new Promise(resolve => setTimeout(resolve, 100));
+
       const canvas = await html2canvas(element, {
         scale: 2,
         useCORS: true,
-        logging: false
+        allowTaint: true,
+        logging: false,
+        backgroundColor: '#ffffff',
+        windowWidth: element.scrollWidth,
+        windowHeight: element.scrollHeight
       });
 
-      const imgData = canvas.toDataURL('image/png');
+      // Hide preview again if it was hidden
+      if (wasHidden) {
+        previewDiv?.classList.add('hidden');
+      }
+
+      // Convert canvas to blob instead of data URL for better handling
+      const blob = await new Promise<Blob>((resolve) => {
+        canvas.toBlob((blob) => {
+          resolve(blob!);
+        }, 'image/jpeg', 0.95);
+      });
+
+      // Create image from blob
+      const imgData = await new Promise<string>((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result as string);
+        reader.readAsDataURL(blob);
+      });
+
       const pdf = new jsPDF('p', 'mm', 'a4');
       const imgWidth = 210;
+      const pageHeight = 297;
       const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      let heightLeft = imgHeight;
+      let position = 0;
 
-      pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+      // Add first page
+      pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+
+      // Add additional pages if needed
+      while (heightLeft > 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+      }
+
       pdf.save(`Invoice-${invoiceNumber}.pdf`);
     } catch (error) {
       console.error('Error generating PDF:', error);
-      alert('Error generating PDF. Please try again.');
+      alert('Error generating PDF. Please try using the Print function (Ctrl+P or Cmd+P) and save as PDF instead.');
     }
   });
 
-  // Form submission - Email via mailto
+  // Form submission - Submit to API
   document.getElementById('invoice-form')?.addEventListener('submit', async (e) => {
     e.preventDefault();
 
@@ -511,20 +558,30 @@ import Footer from '../components/Footer.astro';
       return;
     }
 
-    // Get form data
-    const companyEmail = (document.getElementById('company-email') as HTMLInputElement).value || 'billing@netzerholdings.com';
-    const invoiceNumber = (document.getElementById('invoice-number') as HTMLInputElement).value;
-    const contractorName = (document.getElementById('contractor-name') as HTMLInputElement).value;
-    const contractorEmail = (document.getElementById('contractor-email') as HTMLInputElement).value;
-    const companyName = (document.getElementById('custom-company-name') as HTMLInputElement).value;
+    // Collect form data
+    const formData = {
+      billTo: {
+        company: (document.getElementById('custom-company-name') as HTMLInputElement).value,
+        address: (document.getElementById('company-address') as HTMLInputElement).value,
+        email: (document.getElementById('company-email') as HTMLInputElement).value,
+      },
+      from: {
+        name: (document.getElementById('contractor-name') as HTMLInputElement).value,
+        email: (document.getElementById('contractor-email') as HTMLInputElement).value,
+        phone: (document.getElementById('contractor-phone') as HTMLInputElement).value,
+        address: (document.getElementById('contractor-address') as HTMLInputElement).value,
+      },
+      invoice: {
+        number: (document.getElementById('invoice-number') as HTMLInputElement).value,
+        date: (document.getElementById('invoice-date') as HTMLInputElement).value,
+        dueDate: (document.getElementById('due-date') as HTMLInputElement).value,
+        notes: (document.getElementById('invoice-notes') as HTMLTextAreaElement).value,
+      },
+      lineItems: [] as any[],
+      total: 0
+    };
 
-    // Collect line items for email body
-    let emailBody = `Invoice Submission from ${contractorName}\n\n`;
-    emailBody += `Invoice Number: ${invoiceNumber}\n`;
-    emailBody += `Bill To: ${companyName}\n`;
-    emailBody += `From: ${contractorName} (${contractorEmail})\n\n`;
-    emailBody += `LINE ITEMS:\n`;
-
+    // Collect line items
     let total = 0;
     document.querySelectorAll('.line-item').forEach(item => {
       const description = (item.querySelector('.item-description') as HTMLInputElement).value;
@@ -532,48 +589,79 @@ import Footer from '../components/Footer.astro';
       const rate = parseFloat((item.querySelector('.item-rate') as HTMLInputElement).value || '0');
       const amount = qty * rate;
       total += amount;
-      emailBody += `${description} - Qty: ${qty} x $${rate.toFixed(2)} = $${amount.toFixed(2)}\n`;
+
+      formData.lineItems.push({
+        description,
+        quantity: qty,
+        rate,
+        amount
+      });
     });
+    formData.total = total;
 
-    emailBody += `\nTOTAL: $${total.toFixed(2)}\n\n`;
-    emailBody += `Please download the attached PDF invoice for full details.\n`;
-    emailBody += `\nThank you!`;
+    try {
+      // Show loading state
+      const submitBtn = document.querySelector('button[type="submit"]') as HTMLButtonElement;
+      const originalText = submitBtn.innerHTML;
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '⏳ Submitting...';
 
-    // Create mailto link
-    const subject = `Invoice ${invoiceNumber} from ${contractorName}`;
-    const mailtoLink = `mailto:${companyEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(emailBody)}`;
+      // Submit to API endpoint
+      const response = await fetch('/api/submit-invoice', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData)
+      });
 
-    // Show success message with instructions
-    const successMsg = document.getElementById('success-message');
-    if (successMsg) {
-      successMsg.innerHTML = `
-        <div class="flex items-start">
-          <svg class="w-6 h-6 text-blue-600 mr-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <div>
-            <h3 class="text-lg font-semibold text-blue-900 mb-2">Ready to Submit Invoice</h3>
-            <p class="text-blue-700 mb-3">Click the button below to open your email client with the invoice details, then attach the downloaded PDF.</p>
-            <div class="flex gap-3">
-              <a href="${mailtoLink}" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold">
-                Open Email Client
-              </a>
-              <button onclick="this.closest('#success-message').classList.add('hidden')" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors">
-                Close
-              </button>
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = originalText;
+
+      if (response.ok) {
+        // Show success message
+        const successMsg = document.getElementById('success-message');
+        if (successMsg) {
+          successMsg.innerHTML = `
+            <div class="flex items-start">
+              <svg class="w-6 h-6 text-green-600 mr-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <div>
+                <h3 class="text-lg font-semibold text-green-900 mb-2">Invoice Submitted Successfully!</h3>
+                <p class="text-green-700 mb-3">Your invoice has been sent to general@netzerholdings.com</p>
+                <p class="text-sm text-green-600">Invoice #${formData.invoice.number} - Total: $${total.toFixed(2)}</p>
+                <button onclick="this.closest('#success-message').classList.add('hidden')" class="mt-3 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+                  Close
+                </button>
+              </div>
             </div>
-            <p class="text-sm text-blue-600 mt-3">Or manually email the PDF to: ${companyEmail}</p>
-          </div>
-        </div>
-      `;
-      successMsg.classList.remove('hidden');
-      successMsg.scrollIntoView({ behavior: 'smooth' });
-    }
+          `;
+          successMsg.classList.remove('hidden');
+          successMsg.scrollIntoView({ behavior: 'smooth' });
+        }
 
-    // Also trigger PDF download
-    setTimeout(() => {
-      document.getElementById('download-btn')?.click();
-    }, 500);
+        // Reset form
+        form.reset();
+        document.getElementById('line-items-container')!.innerHTML = '';
+        lineItemCount = 0;
+        addLineItem();
+        calculateTotal();
+
+        // Hide preview
+        document.getElementById('invoice-preview')?.classList.add('hidden');
+
+        // Hide success message after 10 seconds
+        setTimeout(() => {
+          document.getElementById('success-message')?.classList.add('hidden');
+        }, 10000);
+      } else {
+        throw new Error('Failed to submit invoice');
+      }
+    } catch (error) {
+      console.error('Error submitting invoice:', error);
+      alert('Error submitting invoice. Please try downloading the PDF and emailing it manually to general@netzerholdings.com');
+    }
   });
 </script>
 
