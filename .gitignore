@@ -31,7 +31,4 @@ pnpm-debug.log*
 
 # database
 data/
-*.db
-*.db-shm
-*.db-wal
 

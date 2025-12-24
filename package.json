@@ -12,10 +12,8 @@
   "dependencies": {
     "@astrojs/node": "^9.5.1",
     "@astrojs/tailwind": "^5.0.0",
-    "@types/better-sqlite3": "^7.6.13",
     "@types/nodemailer": "^7.0.4",
     "astro": "^5.16.6",
-    "better-sqlite3": "^12.5.0",
     "html2canvas": "^1.4.1",
     "jspdf": "^3.0.4",
     "nodemailer": "^7.0.12",
