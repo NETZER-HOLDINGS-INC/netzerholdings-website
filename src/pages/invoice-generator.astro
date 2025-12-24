@@ -239,10 +239,12 @@ import Footer from '../components/Footer.astro';
     const emailInput = document.getElementById('company-email') as HTMLInputElement;
 
     if (select.value && select.value !== 'custom') {
-      const company = companyData[select.value];
-      customNameInput.value = company.name;
-      addressInput.value = company.address;
-      emailInput.value = company.email;
+      const company = companyData[select.value as keyof typeof companyData];
+      if (company) {
+        customNameInput.value = company.name;
+        addressInput.value = company.address;
+        emailInput.value = company.email;
+      }
     } else if (select.value === 'custom') {
       customNameInput.value = '';
       addressInput.value = '';
