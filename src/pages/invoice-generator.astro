@@ -1,0 +1,603 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<Layout title="Invoice Generator - Netzer Holdings" description="Create and submit invoices for subcontractor services">
+  <Header />
+  
+  <main class="pt-24 pb-16 px-4 sm:px-6 lg:px-8 bg-gray-50 min-h-screen">
+    <div class="max-w-5xl mx-auto">
+      <div class="text-center mb-8">
+        <h1 class="text-4xl font-bold text-gray-900 mb-2">Invoice Generator</h1>
+        <p class="text-gray-600">Create professional invoices for your services</p>
+      </div>
+
+      <!-- Invoice Form -->
+      <div class="bg-white rounded-lg shadow-lg p-8 mb-8">
+        <form id="invoice-form">
+          <!-- Bill To Section -->
+          <div class="mb-8">
+            <h2 class="text-2xl font-semibold mb-4">Bill To</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Company *</label>
+                <select id="bill-to-company" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+                  <option value="">Select Company...</option>
+                  <option value="ahsn">American Home Services Network LLC</option>
+                  <option value="chimney">Chimney Services Division</option>
+                  <option value="airduct">Air Duct Services Division</option>
+                  <option value="dryervent">Dryer Vent Services Division</option>
+                  <option value="garagedoor">Garage Door Services Division</option>
+                  <option value="custom">Custom (Edit Below)</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Invoice Date *</label>
+                <input type="date" id="invoice-date" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+              </div>
+            </div>
+            
+            <div class="mt-4">
+              <label class="block text-sm font-medium text-gray-700 mb-2">Company Name (Editable)</label>
+              <input type="text" id="custom-company-name" placeholder="Edit company name if needed" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Address</label>
+                <input type="text" id="company-address" placeholder="Company address" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                <input type="email" id="company-email" placeholder="billing@company.com" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+              </div>
+            </div>
+          </div>
+
+          <!-- From Section -->
+          <div class="mb-8">
+            <h2 class="text-2xl font-semibold mb-4">From (Your Information)</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Your Name/Business *</label>
+                <input type="text" id="contractor-name" required placeholder="John Doe / ABC Services LLC" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Your Email *</label>
+                <input type="email" id="contractor-email" required placeholder="your@email.com" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Phone</label>
+                <input type="tel" id="contractor-phone" placeholder="(555) 123-4567" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Address</label>
+                <input type="text" id="contractor-address" placeholder="Your business address" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+              </div>
+            </div>
+          </div>
+
+          <!-- Invoice Details -->
+          <div class="mb-8">
+            <h2 class="text-2xl font-semibold mb-4">Invoice Details</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Invoice Number *</label>
+                <input type="text" id="invoice-number" required placeholder="INV-001" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Due Date</label>
+                <input type="date" id="due-date" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+              </div>
+            </div>
+          </div>
+
+          <!-- Line Items -->
+          <div class="mb-8">
+            <div class="flex justify-between items-center mb-4">
+              <h2 class="text-2xl font-semibold">Line Items</h2>
+              <button type="button" id="add-line-item" class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors">
+                + Add Item
+              </button>
+            </div>
+            
+            <div id="line-items-container" class="space-y-4">
+              <!-- Line items will be added here dynamically -->
+            </div>
+          </div>
+
+          <!-- Notes -->
+          <div class="mb-8">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Notes / Additional Information</label>
+            <textarea id="invoice-notes" rows="3" placeholder="Payment terms, thank you message, etc." class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"></textarea>
+          </div>
+
+          <!-- Total -->
+          <div class="border-t pt-6">
+            <div class="flex justify-end">
+              <div class="w-full md:w-1/2">
+                <div class="flex justify-between mb-2">
+                  <span class="text-gray-600">Subtotal:</span>
+                  <span id="subtotal" class="font-semibold">$0.00</span>
+                </div>
+                <div class="flex justify-between mb-2">
+                  <span class="text-gray-600">Tax (0%):</span>
+                  <span id="tax" class="font-semibold">$0.00</span>
+                </div>
+                <div class="flex justify-between text-xl font-bold border-t pt-2">
+                  <span>Total:</span>
+                  <span id="total">$0.00</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="flex flex-col sm:flex-row gap-4 mt-8">
+            <button type="button" id="preview-btn" class="flex-1 px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors font-semibold">
+              Preview Invoice
+            </button>
+            <button type="button" id="download-btn" class="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold">
+              Download PDF
+            </button>
+            <button type="submit" class="flex-1 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold">
+              Submit & Email Invoice
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Invoice Preview (Hidden by default) -->
+      <div id="invoice-preview" class="hidden bg-white rounded-lg shadow-lg p-8 print:shadow-none">
+        <div id="invoice-content">
+          <!-- Invoice content will be generated here -->
+        </div>
+      </div>
+
+      <!-- Success Message -->
+      <div id="success-message" class="hidden bg-green-50 border border-green-200 rounded-lg p-6 mb-8">
+        <div class="flex items-center">
+          <svg class="w-6 h-6 text-green-600 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <div>
+            <h3 class="text-lg font-semibold text-green-900">Invoice Submitted Successfully!</h3>
+            <p class="text-green-700">Your invoice has been sent to the billing department.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <Footer />
+</Layout>
+
+<style>
+  @media print {
+    header, footer, #invoice-form, button {
+      display: none !important;
+    }
+    #invoice-preview {
+      display: block !important;
+      box-shadow: none !important;
+    }
+    body {
+      background: white !important;
+    }
+  }
+</style>
+
+<script>
+  import jsPDF from 'jspdf';
+  import html2canvas from 'html2canvas';
+
+  // Company data
+  const companyData = {
+    'ahsn': {
+      name: 'American Home Services Network LLC',
+      address: '123 Business Center Dr, Suite 100',
+      email: 'billing@ahsn.com'
+    },
+    'chimney': {
+      name: 'Chimney Services Division - AHSN',
+      address: '123 Business Center Dr, Suite 100',
+      email: 'chimney-billing@ahsn.com'
+    },
+    'airduct': {
+      name: 'Air Duct Services Division - AHSN',
+      address: '123 Business Center Dr, Suite 100',
+      email: 'airduct-billing@ahsn.com'
+    },
+    'dryervent': {
+      name: 'Dryer Vent Services Division - AHSN',
+      address: '123 Business Center Dr, Suite 100',
+      email: 'dryervent-billing@ahsn.com'
+    },
+    'garagedoor': {
+      name: 'Garage Door Services Division - AHSN',
+      address: '123 Business Center Dr, Suite 100',
+      email: 'garagedoor-billing@ahsn.com'
+    }
+  };
+
+  let lineItemCount = 0;
+
+  // Set today's date as default
+  const today = new Date().toISOString().split('T')[0];
+  (document.getElementById('invoice-date') as HTMLInputElement).value = today;
+
+  // Add initial line item
+  addLineItem();
+
+  // Company selection handler
+  document.getElementById('bill-to-company')?.addEventListener('change', function(e) {
+    const select = e.target as HTMLSelectElement;
+    const customNameInput = document.getElementById('custom-company-name') as HTMLInputElement;
+    const addressInput = document.getElementById('company-address') as HTMLInputElement;
+    const emailInput = document.getElementById('company-email') as HTMLInputElement;
+
+    if (select.value && select.value !== 'custom') {
+      const company = companyData[select.value];
+      customNameInput.value = company.name;
+      addressInput.value = company.address;
+      emailInput.value = company.email;
+    } else if (select.value === 'custom') {
+      customNameInput.value = '';
+      addressInput.value = '';
+      emailInput.value = '';
+    }
+  });
+
+  // Add line item button
+  document.getElementById('add-line-item')?.addEventListener('click', addLineItem);
+
+  function addLineItem() {
+    lineItemCount++;
+    const container = document.getElementById('line-items-container');
+    const lineItem = document.createElement('div');
+    lineItem.className = 'grid grid-cols-12 gap-2 items-start line-item';
+    lineItem.innerHTML = `
+      <div class="col-span-12 md:col-span-5">
+        <input type="text" class="item-description w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500" placeholder="Description" required>
+      </div>
+      <div class="col-span-4 md:col-span-2">
+        <input type="number" class="item-quantity w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500" placeholder="Qty" min="1" value="1" required>
+      </div>
+      <div class="col-span-4 md:col-span-2">
+        <input type="number" class="item-rate w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500" placeholder="Rate" min="0" step="0.01" required>
+      </div>
+      <div class="col-span-3 md:col-span-2">
+        <input type="text" class="item-amount w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50" placeholder="$0.00" readonly>
+      </div>
+      <div class="col-span-1 md:col-span-1 flex items-center justify-center">
+        <button type="button" class="remove-item text-red-600 hover:text-red-800 p-2">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+          </svg>
+        </button>
+      </div>
+    `;
+    container?.appendChild(lineItem);
+
+    // Add event listeners for calculation
+    const qtyInput = lineItem.querySelector('.item-quantity') as HTMLInputElement;
+    const rateInput = lineItem.querySelector('.item-rate') as HTMLInputElement;
+    const removeBtn = lineItem.querySelector('.remove-item');
+
+    qtyInput?.addEventListener('input', calculateLineItem);
+    rateInput?.addEventListener('input', calculateLineItem);
+    removeBtn?.addEventListener('click', () => {
+      lineItem.remove();
+      calculateTotal();
+    });
+  }
+
+  function calculateLineItem(e: Event) {
+    const lineItem = (e.target as HTMLElement).closest('.line-item');
+    const qty = parseFloat((lineItem?.querySelector('.item-quantity') as HTMLInputElement)?.value || '0');
+    const rate = parseFloat((lineItem?.querySelector('.item-rate') as HTMLInputElement)?.value || '0');
+    const amount = qty * rate;
+    const amountInput = lineItem?.querySelector('.item-amount') as HTMLInputElement;
+    if (amountInput) {
+      amountInput.value = `$${amount.toFixed(2)}`;
+    }
+    calculateTotal();
+  }
+
+  function calculateTotal() {
+    let subtotal = 0;
+    document.querySelectorAll('.line-item').forEach(item => {
+      const qty = parseFloat((item.querySelector('.item-quantity') as HTMLInputElement)?.value || '0');
+      const rate = parseFloat((item.querySelector('.item-rate') as HTMLInputElement)?.value || '0');
+      subtotal += qty * rate;
+    });
+
+    const tax = 0; // Can be modified to include tax calculation
+    const total = subtotal + tax;
+
+    (document.getElementById('subtotal') as HTMLElement).textContent = `$${subtotal.toFixed(2)}`;
+    (document.getElementById('tax') as HTMLElement).textContent = `$${tax.toFixed(2)}`;
+    (document.getElementById('total') as HTMLElement).textContent = `$${total.toFixed(2)}`;
+  }
+
+  // Generate invoice HTML
+  function generateInvoiceHTML() {
+    const companyName = (document.getElementById('custom-company-name') as HTMLInputElement).value;
+    const companyAddress = (document.getElementById('company-address') as HTMLInputElement).value;
+    const companyEmail = (document.getElementById('company-email') as HTMLInputElement).value;
+    const invoiceDate = (document.getElementById('invoice-date') as HTMLInputElement).value;
+    const invoiceNumber = (document.getElementById('invoice-number') as HTMLInputElement).value;
+    const dueDate = (document.getElementById('due-date') as HTMLInputElement).value;
+    const contractorName = (document.getElementById('contractor-name') as HTMLInputElement).value;
+    const contractorEmail = (document.getElementById('contractor-email') as HTMLInputElement).value;
+    const contractorPhone = (document.getElementById('contractor-phone') as HTMLInputElement).value;
+    const contractorAddress = (document.getElementById('contractor-address') as HTMLInputElement).value;
+    const notes = (document.getElementById('invoice-notes') as HTMLTextAreaElement).value;
+
+    // Get line items
+    let lineItemsHTML = '';
+    let subtotal = 0;
+    document.querySelectorAll('.line-item').forEach(item => {
+      const description = (item.querySelector('.item-description') as HTMLInputElement).value;
+      const qty = parseFloat((item.querySelector('.item-quantity') as HTMLInputElement).value || '0');
+      const rate = parseFloat((item.querySelector('.item-rate') as HTMLInputElement).value || '0');
+      const amount = qty * rate;
+      subtotal += amount;
+
+      lineItemsHTML += `
+        <tr class="border-b">
+          <td class="py-3 px-4">${description}</td>
+          <td class="py-3 px-4 text-center">${qty}</td>
+          <td class="py-3 px-4 text-right">$${rate.toFixed(2)}</td>
+          <td class="py-3 px-4 text-right font-semibold">$${amount.toFixed(2)}</td>
+        </tr>
+      `;
+    });
+
+    const total = subtotal;
+
+    return `
+      <div class="max-w-4xl mx-auto p-8 bg-white">
+        <!-- Header -->
+        <div class="flex justify-between items-start mb-8 border-b pb-6">
+          <div>
+            <h1 class="text-4xl font-bold text-gray-900 mb-2">INVOICE</h1>
+            <p class="text-gray-600">Invoice #: ${invoiceNumber}</p>
+            <p class="text-gray-600">Date: ${new Date(invoiceDate).toLocaleDateString()}</p>
+            ${dueDate ? `<p class="text-gray-600">Due Date: ${new Date(dueDate).toLocaleDateString()}</p>` : ''}
+          </div>
+          <div class="text-right">
+            <div class="text-2xl font-bold text-primary-600 mb-2">Netzer Holdings</div>
+            <p class="text-sm text-gray-600">Subcontractor Invoice</p>
+          </div>
+        </div>
+
+        <!-- Bill To / From -->
+        <div class="grid grid-cols-2 gap-8 mb-8">
+          <div>
+            <h3 class="text-sm font-semibold text-gray-500 uppercase mb-2">Bill To:</h3>
+            <div class="text-gray-900">
+              <p class="font-semibold text-lg">${companyName}</p>
+              ${companyAddress ? `<p class="text-sm">${companyAddress}</p>` : ''}
+              ${companyEmail ? `<p class="text-sm">${companyEmail}</p>` : ''}
+            </div>
+          </div>
+          <div>
+            <h3 class="text-sm font-semibold text-gray-500 uppercase mb-2">From:</h3>
+            <div class="text-gray-900">
+              <p class="font-semibold text-lg">${contractorName}</p>
+              ${contractorAddress ? `<p class="text-sm">${contractorAddress}</p>` : ''}
+              ${contractorEmail ? `<p class="text-sm">${contractorEmail}</p>` : ''}
+              ${contractorPhone ? `<p class="text-sm">${contractorPhone}</p>` : ''}
+            </div>
+          </div>
+        </div>
+
+        <!-- Line Items Table -->
+        <table class="w-full mb-8">
+          <thead class="bg-gray-100">
+            <tr>
+              <th class="py-3 px-4 text-left font-semibold text-gray-700">Description</th>
+              <th class="py-3 px-4 text-center font-semibold text-gray-700">Qty</th>
+              <th class="py-3 px-4 text-right font-semibold text-gray-700">Rate</th>
+              <th class="py-3 px-4 text-right font-semibold text-gray-700">Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${lineItemsHTML}
+          </tbody>
+        </table>
+
+        <!-- Totals -->
+        <div class="flex justify-end mb-8">
+          <div class="w-64">
+            <div class="flex justify-between py-2 border-b">
+              <span class="text-gray-600">Subtotal:</span>
+              <span class="font-semibold">$${subtotal.toFixed(2)}</span>
+            </div>
+            <div class="flex justify-between py-2 border-b">
+              <span class="text-gray-600">Tax:</span>
+              <span class="font-semibold">$0.00</span>
+            </div>
+            <div class="flex justify-between py-3 text-xl font-bold bg-gray-50 px-4 rounded">
+              <span>Total:</span>
+              <span class="text-primary-600">$${total.toFixed(2)}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Notes -->
+        ${notes ? `
+          <div class="border-t pt-6">
+            <h3 class="text-sm font-semibold text-gray-500 uppercase mb-2">Notes:</h3>
+            <p class="text-gray-700 whitespace-pre-line">${notes}</p>
+          </div>
+        ` : ''}
+
+        <!-- Footer -->
+        <div class="mt-12 pt-6 border-t text-center text-sm text-gray-500">
+          <p>Thank you for your business!</p>
+          <p class="mt-2">This invoice was generated via Netzer Holdings Invoice Generator</p>
+        </div>
+      </div>
+    `;
+  }
+
+  // Preview button
+  document.getElementById('preview-btn')?.addEventListener('click', () => {
+    const form = document.getElementById('invoice-form') as HTMLFormElement;
+    if (!form.checkValidity()) {
+      form.reportValidity();
+      return;
+    }
+
+    const previewDiv = document.getElementById('invoice-preview');
+    const contentDiv = document.getElementById('invoice-content');
+    if (contentDiv) {
+      contentDiv.innerHTML = generateInvoiceHTML();
+    }
+    previewDiv?.classList.remove('hidden');
+    previewDiv?.scrollIntoView({ behavior: 'smooth' });
+  });
+
+  // Download PDF button
+  document.getElementById('download-btn')?.addEventListener('click', async () => {
+    const form = document.getElementById('invoice-form') as HTMLFormElement;
+    if (!form.checkValidity()) {
+      form.reportValidity();
+      return;
+    }
+
+    const invoiceNumber = (document.getElementById('invoice-number') as HTMLInputElement).value;
+    const contentDiv = document.getElementById('invoice-content');
+    if (contentDiv) {
+      contentDiv.innerHTML = generateInvoiceHTML();
+    }
+
+    const element = document.getElementById('invoice-content');
+    if (!element) return;
+
+    try {
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        logging: false
+      });
+
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const imgWidth = 210;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+      pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+      pdf.save(`Invoice-${invoiceNumber}.pdf`);
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      alert('Error generating PDF. Please try again.');
+    }
+  });
+
+  // Form submission
+  document.getElementById('invoice-form')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const form = e.target as HTMLFormElement;
+    if (!form.checkValidity()) {
+      form.reportValidity();
+      return;
+    }
+
+    // Collect form data
+    const formData = {
+      billTo: {
+        company: (document.getElementById('custom-company-name') as HTMLInputElement).value,
+        address: (document.getElementById('company-address') as HTMLInputElement).value,
+        email: (document.getElementById('company-email') as HTMLInputElement).value,
+      },
+      from: {
+        name: (document.getElementById('contractor-name') as HTMLInputElement).value,
+        email: (document.getElementById('contractor-email') as HTMLInputElement).value,
+        phone: (document.getElementById('contractor-phone') as HTMLInputElement).value,
+        address: (document.getElementById('contractor-address') as HTMLInputElement).value,
+      },
+      invoice: {
+        number: (document.getElementById('invoice-number') as HTMLInputElement).value,
+        date: (document.getElementById('invoice-date') as HTMLInputElement).value,
+        dueDate: (document.getElementById('due-date') as HTMLInputElement).value,
+        notes: (document.getElementById('invoice-notes') as HTMLTextAreaElement).value,
+      },
+      lineItems: [] as any[],
+      total: 0
+    };
+
+    // Collect line items
+    let total = 0;
+    document.querySelectorAll('.line-item').forEach(item => {
+      const description = (item.querySelector('.item-description') as HTMLInputElement).value;
+      const qty = parseFloat((item.querySelector('.item-quantity') as HTMLInputElement).value || '0');
+      const rate = parseFloat((item.querySelector('.item-rate') as HTMLInputElement).value || '0');
+      const amount = qty * rate;
+      total += amount;
+
+      formData.lineItems.push({
+        description,
+        quantity: qty,
+        rate,
+        amount
+      });
+    });
+    formData.total = total;
+
+    // Generate invoice HTML for email
+    const invoiceHTML = generateInvoiceHTML();
+
+    try {
+      // Submit to API endpoint
+      const response = await fetch('/api/submit-invoice', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...formData,
+          invoiceHTML
+        })
+      });
+
+      if (response.ok) {
+        // Show success message
+        document.getElementById('success-message')?.classList.remove('hidden');
+        document.getElementById('success-message')?.scrollIntoView({ behavior: 'smooth' });
+
+        // Reset form
+        form.reset();
+        document.getElementById('line-items-container')!.innerHTML = '';
+        lineItemCount = 0;
+        addLineItem();
+        calculateTotal();
+
+        // Hide preview
+        document.getElementById('invoice-preview')?.classList.add('hidden');
+
+        // Hide success message after 5 seconds
+        setTimeout(() => {
+          document.getElementById('success-message')?.classList.add('hidden');
+        }, 5000);
+      } else {
+        throw new Error('Failed to submit invoice');
+      }
+    } catch (error) {
+      console.error('Error submitting invoice:', error);
+      alert('Error submitting invoice. Please try downloading the PDF and emailing it manually.');
+    }
+  });
+</script>
+
+<style is:global>
+  .print\:shadow-none {
+    box-shadow: none;
+  }
+</style>
+
