@@ -29,3 +29,9 @@ pnpm-debug.log*
 # astro
 .astro/
 
+# database
+data/
+*.db
+*.db-shm
+*.db-wal
+

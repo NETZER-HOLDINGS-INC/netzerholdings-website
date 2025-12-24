@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro';
 import nodemailer from 'nodemailer';
+import { saveInvoice, getNextInvoiceNumber } from '../../lib/db';
 
 export const prerender = false;
 
@@ -24,12 +25,36 @@ export const POST: APIRoute = async ({ request }) => {
     });
 
     // Validate required data
-    if (!data.billTo || !data.from || !data.invoice || !data.lineItems) {
+    if (!data.billTo || !data.from || !data.lineItems) {
       return new Response(JSON.stringify({ error: 'Missing required invoice data' }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' }
       });
     }
+
+    // Generate invoice number if not provided
+    const invoiceNumber = data.invoiceNumber || getNextInvoiceNumber();
+    const invoiceDate = data.invoiceDate || new Date().toISOString().split('T')[0];
+
+    // Save invoice to database
+    const invoiceId = saveInvoice({
+      invoice_number: invoiceNumber,
+      contractor_name: data.from.name,
+      contractor_email: data.from.email,
+      contractor_phone: data.from.phone,
+      contractor_address: data.from.address,
+      company_name: data.billTo.company,
+      company_address: data.billTo.address,
+      company_email: data.billTo.email,
+      invoice_date: invoiceDate,
+      due_date: data.dueDate,
+      notes: data.notes,
+      total: data.total,
+      line_items: JSON.stringify(data.lineItems),
+      status: 'submitted'
+    });
+
+    console.log(`Invoice saved to database: ID ${invoiceId}, Number ${invoiceNumber}`);
 
     // Create email HTML
     const emailHTML = `
@@ -53,7 +78,7 @@ export const POST: APIRoute = async ({ request }) => {
         <div class="container">
           <div class="header">
             <h1>New Invoice Submission</h1>
-            <p>Invoice #${data.invoice.number}</p>
+            <p>Invoice #${invoiceNumber}</p>
           </div>
 
           <div class="invoice-details">
@@ -61,8 +86,8 @@ export const POST: APIRoute = async ({ request }) => {
               <div class="section-title">Bill To:</div>
               <p>
                 <strong>${data.billTo.company}</strong><br>
-                ${data.billTo.address}<br>
-                ${data.billTo.email}
+                ${data.billTo.address || ''}<br>
+                ${data.billTo.email || ''}
               </p>
             </div>
 
@@ -79,9 +104,9 @@ export const POST: APIRoute = async ({ request }) => {
             <div class="section">
               <div class="section-title">Invoice Details:</div>
               <p>
-                <strong>Invoice Number:</strong> ${data.invoice.number}<br>
-                <strong>Invoice Date:</strong> ${data.invoice.date}<br>
-                <strong>Due Date:</strong> ${data.invoice.dueDate || 'N/A'}
+                <strong>Invoice Number:</strong> ${invoiceNumber}<br>
+                <strong>Invoice Date:</strong> ${invoiceDate}<br>
+                <strong>Due Date:</strong> ${data.dueDate || 'N/A'}
               </p>
             </div>
           </div>
@@ -114,21 +139,34 @@ export const POST: APIRoute = async ({ request }) => {
             Total: $${data.total.toFixed(2)}
           </div>
 
-          ${data.invoice.notes ? `
+          ${data.notes ? `
             <div class="section">
               <div class="section-title">Notes:</div>
-              <p>${data.invoice.notes}</p>
+              <p>${data.notes}</p>
             </div>
           ` : ''}
 
           <div style="margin-top: 40px; padding: 20px; background: #f9fafb; border-left: 4px solid #1e40af;">
             <p><strong>This is an automated invoice submission from the Netzer Holdings Invoice Generator.</strong></p>
-            <p>Please review the details above and process accordingly.</p>
+            <p>Invoice has been saved to the system with ID: ${invoiceId}</p>
+            <p>Please review the attached PDF and process accordingly.</p>
           </div>
         </div>
       </body>
       </html>
     `;
+
+    // Prepare PDF attachment if provided
+    const attachments = [];
+    if (data.pdfData) {
+      // PDF data is base64 encoded from the frontend
+      const pdfBuffer = Buffer.from(data.pdfData.split(',')[1], 'base64');
+      attachments.push({
+        filename: `Invoice-${invoiceNumber}.pdf`,
+        content: pdfBuffer,
+        contentType: 'application/pdf'
+      });
+    }
 
     // If SMTP is configured, send email
     if (SMTP_HOST && SMTP_USER && SMTP_PASS) {
@@ -143,25 +181,31 @@ export const POST: APIRoute = async ({ request }) => {
       });
 
       await transporter.sendMail({
-        from: `"Invoice System" <${SMTP_USER}>`,
+        from: `"Netzer Holdings Invoice System" <${SMTP_USER}>`,
         to: INVOICE_EMAIL,
         replyTo: data.from.email,
-        subject: `Invoice #${data.invoice.number} from ${data.from.name}`,
+        subject: `Invoice #${invoiceNumber} from ${data.from.name} - $${data.total.toFixed(2)}`,
         html: emailHTML,
+        attachments: attachments
       });
 
-      console.log(`Invoice #${data.invoice.number} sent to ${INVOICE_EMAIL}`);
+      console.log(`Invoice #${invoiceNumber} sent to ${INVOICE_EMAIL} with ${attachments.length > 0 ? 'PDF attachment' : 'no attachment'}`);
     } else {
       // Development mode - just log
       console.log('=== INVOICE SUBMISSION (SMTP NOT CONFIGURED) ===');
       console.log(`To: ${INVOICE_EMAIL}`);
       console.log(`From: ${data.from.name} <${data.from.email}>`);
-      console.log(`Invoice #: ${data.invoice.number}`);
+      console.log(`Invoice #: ${invoiceNumber}`);
       console.log(`Total: $${data.total.toFixed(2)}`);
+      console.log(`PDF Attached: ${attachments.length > 0 ? 'Yes' : 'No'}`);
       console.log('===============================================');
     }
 
-    return new Response(JSON.stringify({ success: true }), {
+    return new Response(JSON.stringify({
+      success: true,
+      invoiceNumber: invoiceNumber,
+      invoiceId: invoiceId
+    }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' }
     });
