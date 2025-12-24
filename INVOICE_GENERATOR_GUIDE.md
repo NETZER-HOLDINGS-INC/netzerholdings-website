@@ -67,46 +67,30 @@ You have three options:
 - Click **"Download PDF"** to save a copy to your computer
 - File will be named: `Invoice-[YourInvoiceNumber].pdf`
 
-#### Submit & Email
-- Click **"Submit & Email Invoice"** to send directly to billing
-- Invoice is automatically emailed to the appropriate billing department
-- You'll see a success message when submitted
-- Form will reset for your next invoice
+#### Prepare Email & Download
+- Click **"📧 Prepare Email & Download"** to:
+  1. Automatically download the PDF invoice
+  2. Open your default email client with pre-filled invoice details
+  3. Attach the downloaded PDF to the email
+  4. Send to the appropriate billing department
+- Or manually email the PDF to the billing address shown
 
-## Email Configuration (For Administrators)
+## How Email Submission Works
 
-### Environment Variables
+The invoice generator uses a **client-side approach** for email submission:
 
-Create a `.env` file in the project root:
+1. When you click "📧 Prepare Email & Download":
+   - The PDF is automatically downloaded to your computer
+   - Your default email client opens with:
+     - Pre-filled recipient (billing department email)
+     - Pre-filled subject line with invoice number
+     - Pre-filled email body with invoice summary
 
-```env
-# Where invoices will be sent
-INVOICE_EMAIL=billing@netzerholdings.com
+2. You then:
+   - Attach the downloaded PDF to the email
+   - Review and send the email
 
-# SMTP Configuration
-SMTP_HOST=smtp.gmail.com
-SMTP_PORT=587
-SMTP_USER=your-email@gmail.com
-SMTP_PASS=your-app-password
-```
-
-### Gmail Setup
-
-1. Go to [Google Account App Passwords](https://myaccount.google.com/apppasswords)
-2. Generate a new app password
-3. Use this password in `SMTP_PASS` (not your regular Gmail password)
-
-### Other Email Providers
-
-- **Outlook**: `smtp-mail.outlook.com`, port 587
-- **Custom SMTP**: Use your provider's SMTP settings
-
-### Development Mode
-
-If SMTP is not configured:
-- Invoices will be logged to the console
-- No emails will be sent
-- Useful for testing
+This approach works with any email client (Gmail, Outlook, Apple Mail, etc.) and doesn't require server-side configuration.
 
 ## Company Billing Addresses
 
@@ -139,20 +123,26 @@ The following companies are pre-configured:
 
 ## Troubleshooting
 
-### Invoice not sending?
-- Check your internet connection
-- Try downloading PDF and emailing manually
-- Contact billing department to confirm receipt
+### Email client not opening?
+- Your browser may be blocking the mailto link
+- Download the PDF manually and compose the email yourself
+- Copy the billing email address from the form
 
 ### PDF not generating?
 - Ensure all required fields are filled
-- Try a different browser (Chrome recommended)
+- Try a different browser (Chrome or Edge recommended)
 - Check browser console for errors
+- Disable browser extensions temporarily
 
 ### Form validation errors?
 - All fields marked with * are required
-- Invoice number must be unique
+- Invoice number should be unique for your records
 - Email addresses must be valid format
+
+### Email client opens but no attachment?
+- The PDF downloads separately to your Downloads folder
+- Manually attach the downloaded PDF file to the email
+- Look for a file named `Invoice-[YourNumber].pdf`
 
 ## Support
 
@@ -162,8 +152,9 @@ For technical issues or questions:
 
 ## Privacy & Security
 
-- All invoice data is transmitted securely
-- Emails are sent via encrypted SMTP
-- No invoice data is stored on our servers
+- All invoice generation happens in your browser (client-side)
+- No invoice data is sent to or stored on our servers
+- Emails are sent directly from your email client
 - Your information is only used for billing purposes
+- PDF files are generated locally on your device
 
