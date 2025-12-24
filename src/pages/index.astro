@@ -1,0 +1,170 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<Layout title="Netzer Holdings - Home Services & Technology">
+  <Header />
+  
+  <main>
+    <!-- Hero Section -->
+    <section class="pt-24 pb-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-gray-50 to-white">
+      <div class="max-w-7xl mx-auto">
+        <div class="text-center max-w-3xl mx-auto">
+          <h1 class="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
+            Building Excellence in
+            <span class="text-primary-600">Home Services</span>
+          </h1>
+          <p class="text-xl text-gray-600 mb-8">
+            A diversified holdings company focused on acquiring, building, and scaling exceptional businesses in the home services sector.
+          </p>
+          <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <a href="#portfolio" class="px-8 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-semibold">
+              View Portfolio
+            </a>
+            <a href="#contact" class="px-8 py-3 border-2 border-gray-300 text-gray-700 rounded-lg hover:border-primary-600 hover:text-primary-600 transition-colors font-semibold">
+              Get in Touch
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-20 px-4 sm:px-6 lg:px-8 bg-white">
+      <div class="max-w-7xl mx-auto">
+        <div class="text-center mb-16">
+          <h2 class="text-4xl font-bold text-gray-900 mb-4">About Netzer Holdings</h2>
+          <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+            We identify, acquire, and grow businesses that deliver essential home services to communities across the United States.
+          </p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div class="text-center p-6">
+            <div class="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg class="w-8 h-8 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <h3 class="text-xl font-semibold mb-2">Quality First</h3>
+            <p class="text-gray-600">We prioritize excellence in service delivery and customer satisfaction across all our holdings.</p>
+          </div>
+          
+          <div class="text-center p-6">
+            <div class="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg class="w-8 h-8 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+              </svg>
+            </div>
+            <h3 class="text-xl font-semibold mb-2">Growth Focused</h3>
+            <p class="text-gray-600">Strategic expansion and operational excellence drive sustainable growth in our portfolio companies.</p>
+          </div>
+          
+          <div class="text-center p-6">
+            <div class="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg class="w-8 h-8 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+            </div>
+            <h3 class="text-xl font-semibold mb-2">People Powered</h3>
+            <p class="text-gray-600">Our success is built on empowering talented teams and fostering a culture of innovation.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Portfolio Section -->
+    <section id="portfolio" class="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50">
+      <div class="max-w-7xl mx-auto">
+        <div class="text-center mb-16">
+          <h2 class="text-4xl font-bold text-gray-900 mb-4">Our Portfolio</h2>
+          <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+            A diverse collection of home service businesses serving communities nationwide.
+          </p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-xl transition-shadow">
+            <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center mb-4">
+              <svg class="w-6 h-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z" />
+              </svg>
+            </div>
+            <h3 class="text-xl font-semibold mb-2">Chimney Services</h3>
+            <p class="text-gray-600">Professional chimney cleaning, inspection, and repair services across major metropolitan areas.</p>
+          </div>
+
+          <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-xl transition-shadow">
+            <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
+              <svg class="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+              </svg>
+            </div>
+            <h3 class="text-xl font-semibold mb-2">Air Duct Cleaning</h3>
+            <p class="text-gray-600">Comprehensive air duct cleaning and HVAC maintenance for healthier indoor air quality.</p>
+          </div>
+
+          <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-xl transition-shadow">
+            <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
+              <svg class="w-6 h-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+              </svg>
+            </div>
+            <h3 class="text-xl font-semibold mb-2">Dryer Vent Services</h3>
+            <p class="text-gray-600">Expert dryer vent cleaning and maintenance to prevent fires and improve efficiency.</p>
+          </div>
+
+          <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-xl transition-shadow">
+            <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
+              <svg class="w-6 h-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+              </svg>
+            </div>
+            <h3 class="text-xl font-semibold mb-2">Garage Door Services</h3>
+            <p class="text-gray-600">Installation, repair, and maintenance of residential and commercial garage door systems.</p>
+          </div>
+        </div>
+
+        <div class="mt-12 bg-white rounded-lg shadow-md p-8">
+          <div class="flex flex-col md:flex-row items-center justify-between">
+            <div class="mb-6 md:mb-0">
+              <h3 class="text-2xl font-bold text-gray-900 mb-2">Atlanta Home Service Network</h3>
+              <p class="text-gray-600">Our flagship platform connecting homeowners with trusted service professionals.</p>
+            </div>
+            <a href="https://atlantahomeservicenetwork.com" target="_blank" rel="noopener noreferrer" class="px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-semibold">
+              Visit AHSN
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-20 px-4 sm:px-6 lg:px-8 bg-white">
+      <div class="max-w-3xl mx-auto text-center">
+        <h2 class="text-4xl font-bold text-gray-900 mb-4">Get in Touch</h2>
+        <p class="text-xl text-gray-600 mb-8">
+          Interested in learning more about our portfolio or exploring partnership opportunities?
+        </p>
+
+        <div class="bg-gray-50 rounded-lg p-8">
+          <div class="space-y-4">
+            <div class="flex items-center justify-center space-x-3">
+              <svg class="w-6 h-6 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+              <a href="mailto:info@netzerholdings.com" class="text-lg text-primary-600 hover:text-primary-700">
+                info@netzerholdings.com
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+</Layout>
+

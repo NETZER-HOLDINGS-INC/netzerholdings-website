@@ -1,0 +1,44 @@
+---
+---
+
+<header class="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-200">
+  <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between items-center h-16">
+      <div class="flex-shrink-0">
+        <a href="/" class="text-2xl font-bold text-gray-900">
+          Netzer Holdings
+        </a>
+      </div>
+      
+      <div class="hidden md:flex space-x-8">
+        <a href="#about" class="text-gray-700 hover:text-primary-600 transition-colors">About</a>
+        <a href="#portfolio" class="text-gray-700 hover:text-primary-600 transition-colors">Portfolio</a>
+        <a href="#contact" class="text-gray-700 hover:text-primary-600 transition-colors">Contact</a>
+      </div>
+      
+      <button id="mobile-menu-button" class="md:hidden p-2 rounded-md text-gray-700 hover:bg-gray-100">
+        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+    </div>
+    
+    <div id="mobile-menu" class="hidden md:hidden pb-4">
+      <div class="flex flex-col space-y-2">
+        <a href="#about" class="text-gray-700 hover:text-primary-600 transition-colors py-2">About</a>
+        <a href="#portfolio" class="text-gray-700 hover:text-primary-600 transition-colors py-2">Portfolio</a>
+        <a href="#contact" class="text-gray-700 hover:text-primary-600 transition-colors py-2">Contact</a>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<script>
+  const mobileMenuButton = document.getElementById('mobile-menu-button');
+  const mobileMenu = document.getElementById('mobile-menu');
+  
+  mobileMenuButton?.addEventListener('click', () => {
+    mobileMenu?.classList.toggle('hidden');
+  });
+</script>
+
